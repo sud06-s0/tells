@@ -233,19 +233,20 @@ export class CueEngine {
     else if (t - this.lastSeen > 1000) this.resetMotion();
 
     // Smooth every cue and apply show/hide hysteresis so the list doesn't flicker.
-    const cues: Cue[] = [];
-    const highlight = new Set<number>();
     for (const id of IDS) {
       const v = this.smooth.get(id)!.push(raw[id] ?? 0, dt);
       if (this.active.has(id)) {
         if (v < HIDE_AT) this.active.delete(id);
       } else if (v > SHOW_AT) this.active.add(id);
-      if (this.active.has(id)) {
-        cues.push({ id, ...DEFS[id], strength: v });
-        if (DEFS[id].tone !== 'open') DEFS[id].joints?.forEach((j) => highlight.add(j));
-      }
     }
-    cues.sort((a, b) => b.strength - a.strength);
+    // Listed in the order they appeared (a Set keeps insertion order), so rows
+    // don't swap places when two cues have similar strength.
+    const cues: Cue[] = [];
+    const highlight = new Set<number>();
+    for (const id of this.active) {
+      cues.push({ id, ...DEFS[id], strength: this.smooth.get(id)!.value });
+      if (DEFS[id].tone !== 'open') DEFS[id].joints?.forEach((j) => highlight.add(j));
+    }
 
     const g = (id: CueId) => this.smooth.get(id)!.value;
     if (present) {

@@ -34,15 +34,19 @@ export class Panel {
     if (now - this.lastRender < 120) return; // ~8 updates a second is plenty to read
     this.lastRender = now;
 
-    if (this.headline.textContent !== r.headline) this.headline.textContent = r.headline;
-    // The headline's letterforms soften as the person reads more open, and stiffen under tension.
-    const casual = r.present ? r.openness : 0.5;
-    const weight = 560 + (r.present ? r.tension : 0) * 240;
-    const slant = -casual * 9;
-    this.headline.style.fontVariationSettings = `"CASL" ${casual.toFixed(2)}, "wght" ${weight.toFixed(0)}, "slnt" ${slant.toFixed(1)}`;
+    // The headline's letterforms soften when the person reads open and stiffen under tension.
+    // Set once per headline change (not every frame), so the word stays still while it's shown.
+    if (this.headline.textContent !== r.headline) {
+      this.headline.textContent = r.headline;
+      const step = (v: number) => Math.round(v * 4) / 4; // coarse steps, no tiny drifts
+      const casual = r.present ? step(r.openness) : 0.5;
+      const weight = 560 + (r.present ? step(r.tension) : 0) * 240;
+      this.headline.style.fontVariationSettings = `"CASL" ${casual}, "wght" ${weight}, "slnt" ${-casual * 9}`;
+    }
 
-    this.detail.textContent = r.detail;
-    this.hint.textContent = r.hint ?? '';
+    if (this.detail.textContent !== r.detail) this.detail.textContent = r.detail;
+    const hint = r.hint ?? '';
+    if (this.hint.textContent !== hint) this.hint.textContent = hint;
     this.hint.hidden = !r.hint;
 
     for (const [key, node] of Object.entries(this.meters)) {
@@ -72,9 +76,11 @@ export class Panel {
     }
     for (const cue of cues) {
       let item = this.items.get(cue.id);
-      if (!item) item = this.createItem(cue);
+      if (!item) {
+        item = this.createItem(cue);
+        this.list.appendChild(item.li); // new cues join at the bottom; existing rows never move
+      }
       item.bar.style.width = `${Math.round(cue.strength * 100)}%`;
-      this.list.appendChild(item.li); // re-appending keeps the list sorted by strength
     }
   }
 
