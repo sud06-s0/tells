@@ -34,6 +34,11 @@ export class Camera {
     await this.start(this.facing === 'user' ? 'environment' : 'user');
   }
 
+  /** The live stream, used when sending this camera to a paired computer. */
+  get current() {
+    return this.stream;
+  }
+
   /** Front cameras are shown mirrored, like a mirror. */
   get mirrored() {
     return this.facing === 'user';

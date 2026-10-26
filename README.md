@@ -15,6 +15,21 @@ npm run dev:phone    # HTTPS on your Wi-Fi, open the "Network" URL on your phone
 
 Phones only allow the camera on HTTPS pages. `dev:phone` uses a self-signed certificate, so your phone will show a warning the first time. Tap through it ("Advanced" then "Proceed").
 
+## Use your phone as the camera (desktop only)
+
+On a computer, the start screen has a second button: **Use your phone's camera**.
+
+1. Click it. A QR code appears.
+2. Scan it with your phone and tap **Share camera**.
+3. Point the phone at the person. The skeleton and reading appear on the computer.
+
+The phone's video goes directly to the computer over WebRTC, encrypted end to end. The free PeerJS cloud server is only used to introduce the two devices and never sees the video. Nothing is recorded on either device. The computer can switch the phone's camera, and stopping on either side ends the session on both.
+
+Notes:
+- The QR code needs an address your phone can reach, so it won't work from `localhost`. Use `npm run dev:phone` and open the **Network** address on the computer too, or use the deployed site.
+- Both devices on the same Wi-Fi is the most reliable. Across different networks (for example, phone on mobile data) some connections can't be made without a TURN relay server.
+- To use your own connection server instead of PeerJS cloud, run `npx peer --port 9000` and copy `.env.example` to `.env`.
+
 ## Deploy
 
 ```bash
@@ -56,6 +71,8 @@ These cues roll up into openness, engagement and tension scores, and the headlin
 ```
 src/main.ts       app wiring, start/stop, render loop
 src/camera.ts     camera start, flip, stop
+src/pairing.ts    phone-to-desktop link (QR code, WebRTC)
+src/phone.ts      phone screen that shares its camera
 src/detector.ts   MediaPipe pose + face models
 src/cues.ts       landmarks → cues, scores and headline
 src/geometry.ts   smoothing, baselines, time windows, head angles

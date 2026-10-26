@@ -44,7 +44,91 @@
         >
           Start camera
         </button>
+        <!-- Desktop only: shown by main.ts when this isn't a phone -->
+        <button
+          id="use-phone"
+          class="mt-3 w-full rounded-2xl border-2 border-chalk/25 px-6 py-4 text-lg font-semibold text-chalk transition hover:border-chalk/60 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-seaglass"
+          hidden
+        >
+          Use your phone’s camera
+        </button>
         <p id="intro-error" class="mt-4 text-amber" role="alert" hidden></p>
+      </div>
+    </section>
+
+    <!-- Desktop: pair a phone -->
+    <section id="pair" class="grid min-h-dvh place-items-center px-6 py-12" hidden>
+      <div class="grid w-full max-w-3xl items-center gap-12 md:grid-cols-[1fr_auto]">
+        <div>
+          <h2 class="headline text-5xl" style="font-variation-settings: 'CASL' 1, 'wght' 700, 'slnt' -8">Scan with your phone</h2>
+          <ol class="mt-8 space-y-4 text-chalk/90">
+            <li class="flex gap-4"><span class="w-5 shrink-0 font-semibold text-seaglass">1</span>Open your phone’s camera and point it at the code.</li>
+            <li class="flex gap-4"><span class="w-5 shrink-0 font-semibold text-seaglass">2</span>Open the link and tap Share camera.</li>
+            <li class="flex gap-4"><span class="w-5 shrink-0 font-semibold text-seaglass">3</span>Point the phone at the person. The reading appears here.</li>
+          </ol>
+          <p class="mt-8 text-sm leading-relaxed text-fog">
+            The phone’s video goes straight to this computer over an encrypted link and is never recorded. Both devices on
+            the same Wi-Fi gives the most reliable connection.
+          </p>
+          <p id="pair-status" class="mt-6 font-semibold text-chalk" role="status">Creating a code…</p>
+          <p id="pair-error" class="mt-2 text-amber" role="alert" hidden></p>
+          <div class="mt-8 flex flex-wrap gap-3">
+            <button
+              id="pair-cancel"
+              class="rounded-2xl border-2 border-chalk/25 px-5 py-3 font-semibold text-chalk transition hover:border-chalk/60 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-seaglass"
+            >
+              Back
+            </button>
+            <button
+              id="pair-copy"
+              class="rounded-2xl border-2 border-chalk/25 px-5 py-3 font-semibold text-chalk transition hover:border-chalk/60 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-seaglass disabled:opacity-50"
+              disabled
+            >
+              Copy link
+            </button>
+          </div>
+        </div>
+        <div class="justify-self-center">
+          <div class="grid size-64 place-items-center rounded-[28px] bg-chalk p-5">
+            <canvas id="pair-qr" class="size-full" aria-label="QR code for pairing your phone" role="img"></canvas>
+          </div>
+          <p id="pair-code" class="mt-3 text-center text-sm text-fog"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Phone: send this camera to a paired computer -->
+    <section id="sender" class="relative h-dvh overflow-hidden bg-dusk-950" hidden>
+      <video id="sender-video" class="absolute inset-0 h-full w-full object-cover" playsinline muted></video>
+
+      <div class="absolute inset-x-0 top-0 bg-gradient-to-b from-dusk-950/85 to-transparent px-5 pb-10 pt-[max(1.25rem,env(safe-area-inset-top))]">
+        <p class="headline text-2xl" style="font-variation-settings: 'CASL' 1, 'wght' 700, 'slnt' -8">Tells</p>
+        <p class="text-xs text-fog">Video goes straight to your computer. Nothing is saved.</p>
+      </div>
+
+      <div class="absolute inset-x-0 bottom-0 rounded-t-[28px] bg-dusk-900/90 px-5 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] backdrop-blur-md">
+        <p id="sender-title" class="headline text-3xl" aria-live="polite">Your computer is ready</p>
+        <p id="sender-note" class="mt-2 text-fog">Share this phone’s camera with it. The reading shows on the computer.</p>
+        <button
+          id="sender-start"
+          class="mt-6 w-full rounded-2xl bg-chalk px-6 py-4 text-lg font-semibold text-dusk-900 transition focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-seaglass disabled:opacity-60"
+        >
+          Share camera
+        </button>
+        <div id="sender-controls" class="mt-6 grid grid-cols-2 gap-3" hidden>
+          <button
+            id="sender-flip"
+            class="rounded-2xl border-2 border-chalk/25 px-4 py-3 font-semibold text-chalk focus-visible:outline-2 focus-visible:outline-seaglass disabled:opacity-50"
+          >
+            Switch camera
+          </button>
+          <button
+            id="sender-stop"
+            class="rounded-2xl bg-chalk px-4 py-3 font-semibold text-dusk-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-seaglass"
+          >
+            Stop sharing
+          </button>
+        </div>
       </div>
     </section>
 
@@ -59,7 +143,7 @@
         >
           <div>
             <p class="headline text-2xl" style="font-variation-settings: 'CASL' 1, 'wght' 700, 'slnt' -8">Tells</p>
-            <p class="text-xs text-fog">On device. Nothing is saved.</p>
+            <p id="live-source" class="text-xs text-fog">On device. Nothing is saved.</p>
           </div>
           <div class="flex gap-2">
             <button
