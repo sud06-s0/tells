@@ -1,0 +1,134 @@
+<!-- index.html -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0f2a2e" />
+    <meta name="description" content="A live, on-device read of body language from your camera. Nothing is recorded." />
+    <title>Tells</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%230f2a2e'/%3E%3Ccircle cx='16' cy='9' r='3.5' fill='%23ede6d6'/%3E%3Cpath d='M8 17l8-3 8 3M16 14v8l-4 6M16 22l4 6' stroke='%23ede6d6' stroke-width='2.4' stroke-linecap='round' fill='none'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Recursive:slnt,wght,CASL@-15..0,300..800,0..1&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="font-sans antialiased">
+    <!-- Start -->
+    <section id="intro" class="grid min-h-dvh place-items-center px-6 py-12">
+      <div class="w-full max-w-md">
+        <h1 class="headline text-6xl" style="font-variation-settings: 'CASL' 1, 'wght' 720, 'slnt' -8">Tells</h1>
+        <p class="mt-4 text-lg leading-relaxed text-chalk/90">
+          Point your camera at someone and get a live read of their posture, gestures and expression.
+        </p>
+
+        <ul class="mt-8 space-y-3 border-l-2 border-seaglass/60 pl-4 text-fog">
+          <li>Everything runs on this device.</li>
+          <li>No video or photos are saved or sent anywhere.</li>
+          <li>Leaving the page turns the camera off.</li>
+        </ul>
+
+        <p class="mt-8 text-sm leading-relaxed text-fog">
+          Body language shows cues, not thoughts. Crossed arms can just mean someone is cold. Ask before you point a
+          camera at anyone.
+        </p>
+
+        <button
+          id="start"
+          class="mt-8 w-full rounded-2xl bg-chalk px-6 py-4 text-lg font-semibold text-dusk-900 transition hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-seaglass disabled:opacity-60"
+        >
+          Start camera
+        </button>
+        <p id="intro-error" class="mt-4 text-amber" role="alert" hidden></p>
+      </div>
+    </section>
+
+    <!-- Live -->
+    <main id="live" class="relative h-dvh overflow-hidden lg:grid lg:grid-cols-[1fr_400px] lg:gap-6 lg:p-6" hidden>
+      <div id="stage" class="relative h-full overflow-hidden bg-dusk-950 lg:rounded-[28px]">
+        <video id="video" class="absolute inset-0 h-full w-full object-cover" playsinline muted></video>
+        <canvas id="overlay" class="pointer-events-none absolute inset-0 h-full w-full"></canvas>
+
+        <div
+          class="absolute inset-x-0 top-0 flex items-center justify-between gap-3 bg-gradient-to-b from-dusk-950/80 to-transparent px-4 pb-8 pt-[max(1rem,env(safe-area-inset-top))]"
+        >
+          <div>
+            <p class="headline text-2xl" style="font-variation-settings: 'CASL' 1, 'wght' 700, 'slnt' -8">Tells</p>
+            <p class="text-xs text-fog">On device. Nothing is saved.</p>
+          </div>
+          <div class="flex gap-2">
+            <button
+              id="flip"
+              class="grid size-11 place-items-center rounded-full bg-dusk-900/70 text-chalk backdrop-blur hover:bg-dusk-800 focus-visible:outline-2 focus-visible:outline-seaglass"
+              aria-label="Switch camera"
+              hidden
+            >
+              <svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M4 10a8 8 0 0 1 14-4l2 2M20 14a8 8 0 0 1-14 4l-2-2" />
+                <path d="M20 4v4h-4M4 20v-4h4" />
+              </svg>
+            </button>
+            <button
+              id="toggle-overlay"
+              class="grid size-11 place-items-center rounded-full bg-dusk-900/70 text-chalk backdrop-blur hover:bg-dusk-800 focus-visible:outline-2 focus-visible:outline-seaglass aria-pressed:bg-chalk aria-pressed:text-dusk-900"
+              aria-label="Show skeleton"
+              aria-pressed="true"
+            >
+              <svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <circle cx="12" cy="5" r="2" />
+                <path d="M5 11l7-3 7 3M12 8v7l-3 6M12 15l3 6" />
+              </svg>
+            </button>
+            <button
+              id="stop"
+              class="grid size-11 place-items-center rounded-full bg-dusk-900/70 text-chalk backdrop-blur hover:bg-dusk-800 focus-visible:outline-2 focus-visible:outline-seaglass"
+              aria-label="Turn camera off"
+            >
+              <svg viewBox="0 0 24 24" class="size-4" fill="currentColor" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2.5" /></svg>
+            </button>
+          </div>
+        </div>
+
+        <div id="status" class="absolute inset-0 grid place-items-center bg-dusk-950/70 px-8 text-center text-chalk" hidden>
+          <p id="status-text" class="max-w-xs"></p>
+        </div>
+      </div>
+
+      <aside
+        id="panel"
+        class="absolute inset-x-0 bottom-0 max-h-[46dvh] overflow-y-auto rounded-t-[28px] bg-dusk-900/90 px-5 pt-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] backdrop-blur-md lg:static lg:max-h-none lg:rounded-[28px] lg:bg-dusk-800 lg:p-7"
+        aria-label="Body language reading"
+      >
+        <p id="headline" class="headline text-4xl leading-[1.05] lg:text-5xl" aria-live="polite">Looking for someone</p>
+        <p id="detail" class="mt-2 text-fog">Nothing is recorded. Each frame is read and thrown away.</p>
+
+        <dl class="mt-5 grid grid-cols-[auto_1fr] items-center gap-x-4 gap-y-2 text-sm">
+          <dt class="text-fog">Openness</dt>
+          <dd id="meter-openness" class="h-2 overflow-hidden rounded-full bg-chalk/10" role="meter" aria-label="Openness" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <span class="block h-full w-0 rounded-full bg-seaglass transition-[width] duration-500"></span>
+          </dd>
+          <dt class="text-fog">Engagement</dt>
+          <dd id="meter-engagement" class="h-2 overflow-hidden rounded-full bg-chalk/10" role="meter" aria-label="Engagement" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <span class="block h-full w-0 rounded-full bg-chalk/80 transition-[width] duration-500"></span>
+          </dd>
+          <dt class="text-fog">Tension</dt>
+          <dd id="meter-tension" class="h-2 overflow-hidden rounded-full bg-chalk/10" role="meter" aria-label="Tension" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+            <span class="block h-full w-0 rounded-full bg-amber transition-[width] duration-500"></span>
+          </dd>
+        </dl>
+
+        <p id="hint" class="mt-5 rounded-2xl bg-dusk-700/60 px-4 py-3 text-sm text-chalk" hidden></p>
+
+        <ul id="cues" class="mt-3 divide-y divide-chalk/10"></ul>
+        <p id="cues-empty" class="mt-4 text-sm text-fog" hidden>No strong cues right now. That usually reads as neutral.</p>
+      </aside>
+    </main>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

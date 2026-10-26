@@ -1,0 +1,23 @@
+{
+  "name": "tells",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "dev:phone": "vite --mode phone",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "models": "node scripts/fetch-models.mjs"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "@vitejs/plugin-basic-ssl": "^2.3.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "~6.0.3",
+    "vite": "^8.3.4"
+  },
+  "dependencies": {
+    "@mediapipe/tasks-vision": "^1.1.1"
+  }
+}

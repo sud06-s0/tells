@@ -1,0 +1,57 @@
+/* src/style.css */
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Recursive", ui-sans-serif, system-ui, sans-serif;
+
+  --color-dusk-950: #0a1f22;
+  --color-dusk-900: #0f2a2e;
+  --color-dusk-800: #15363b;
+  --color-dusk-700: #20494e;
+  --color-chalk: #ede6d6;
+  --color-fog: #9db5b1;
+  --color-seaglass: #8fd1b9;
+  --color-amber: #f2a65a;
+}
+
+html,
+body {
+  background: var(--color-dusk-900);
+  color: var(--color-chalk);
+}
+
+body {
+  font-variation-settings: "CASL" 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* The live headline: its axes are driven from panel.ts. */
+.headline {
+  font-variation-settings: "CASL" 0.5, "wght" 640, "slnt" -4;
+  transition: font-variation-settings 900ms ease;
+  letter-spacing: -0.02em;
+}
+
+.cue-enter {
+  animation: cue-in 260ms ease-out;
+}
+
+@keyframes cue-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .headline {
+    transition: none;
+  }
+  .cue-enter {
+    animation: none;
+  }
+}
+
+[hidden] {
+  display: none !important;
+}
