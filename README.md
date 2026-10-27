@@ -5,6 +5,27 @@ Live body-language reading from a phone or laptop camera. Pose and face models r
 
 Built with TypeScript, Tailwind CSS v4, Vite and Google MediaPipe Tasks Vision (Apache 2.0, free).
 
+## Modes
+
+| Mode | Camera points at | What you get |
+| --- | --- | --- |
+| Read someone | Another person (asks you to confirm they know) | What their posture, gestures and expression can suggest |
+| Interview practice | You, sitting | Tips on eye contact, posture and nervous habits, then a summary |
+| Presentation practice | You, standing | Tips on gestures, facing your audience and stance, then a summary |
+| Video call check (desktop) | You, during a call | One reminder at a time when a habit lasts too long, plus a summary |
+
+Practice modes start with a few seconds of calibration so the tips fit your normal posture. The summary shows what went well, what to work on with a tip for each, and average openness, engagement and tension. It's kept in memory only and is gone when you leave the page.
+
+In **Video call check**, **Pop out** opens a small always-on-top window (Chrome and Edge on desktop) so reminders stay visible over Zoom, Meet or Teams. Without the pop-out, leaving the tab turns the camera off as usual.
+
+## Languages
+
+English, Bengali (বাংলা) and Hindi (हिन्दी). Switch from the top of the start screen. The choice is remembered on that device, and a paired phone opens in the same language. All text is in `src/i18n/`: `en.ts` is the source, and TypeScript fails the build if `bn.ts` or `hi.ts` is missing a string.
+
+## What Tells won't do
+
+No lie detection, no "are they attracted to me" readings, no scoring of job candidates or students, and no hidden or background mode. Body language can't reliably answer those questions, and judging people's emotions at work or school is restricted in some places (for example under the EU AI Act). Reading someone else requires ticking that they know and are okay with it.
+
 ## Run it
 
 ```bash
@@ -69,7 +90,12 @@ These cues roll up into openness, engagement and tension scores, and the headlin
 ## Files
 
 ```
-src/main.ts       app wiring, start/stop, render loop
+src/main.ts       app wiring: screens, modes, calibration, render loop
+src/modes.ts      the four modes and how each treats a cue
+src/session.ts    in-memory practice stats for the summary
+src/nudges.ts     video call reminders
+src/pip.ts        video call pop-out window
+src/i18n/         English, Bengali and Hindi strings
 src/camera.ts     camera start, flip, stop
 src/pairing.ts    phone-to-desktop link (QR code, WebRTC)
 src/phone.ts      phone screen that shares its camera

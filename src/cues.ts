@@ -42,137 +42,58 @@ export type CueId =
   | 'blinking';
 
 interface CueDef {
-  label: string;
-  meaning: string;
-  tone: Tone;
+  tone: Tone; // what it tends to mean in someone else
+  face?: boolean; // measured by the face model rather than the body model
   joints?: number[]; // pose landmark indices to highlight in the overlay
   tau?: number; // smoothing in seconds
 }
 
+// Names, meanings and tips live in src/i18n, keyed by these ids.
 const DEFS: Record<CueId, CueDef> = {
-  armsCrossed: {
-    label: 'Arms crossed',
-    meaning: 'Often guarded or self-protective. It can also just mean they are cold or comfortable.',
-    tone: 'closed',
-    joints: [13, 14, 15, 16],
-  },
-  handsOnHips: {
-    label: 'Hands on hips',
-    meaning: 'Takes up space. Reads as confident, ready, or impatient.',
-    tone: 'neutral',
-    joints: [13, 14, 15, 16],
-  },
-  handToFace: {
-    label: 'Hand near face',
-    meaning: 'Common when thinking, unsure, or self-soothing.',
-    tone: 'neutral',
-    joints: [15, 16, 19, 20],
-  },
-  gesturing: {
-    label: 'Gesturing',
-    meaning: 'Hands active and visible. Usually engaged and expressive.',
-    tone: 'open',
-    joints: [15, 16],
-  },
-  fidgeting: {
-    label: 'Fidgeting',
-    meaning: 'Small repeated hand movements. Can point to restlessness or nerves.',
-    tone: 'closed',
-    joints: [15, 16, 17, 18, 19, 20],
-    tau: 1,
-  },
-  handsHidden: {
-    label: 'Hands out of sight',
-    meaning: 'Hands hidden or behind the body. Gives less away; sometimes reserved.',
-    tone: 'closed',
-  },
-  leaningIn: {
-    label: 'Leaning in',
-    meaning: 'Moving toward you. Usually interest or engagement.',
-    tone: 'open',
-  },
-  leaningBack: {
-    label: 'Leaning back',
-    meaning: 'Making distance. Relaxed, or less engaged.',
-    tone: 'closed',
-  },
-  turnedAway: {
-    label: 'Body turned away',
-    meaning: 'Shoulders angled away from you. Attention may be elsewhere.',
-    tone: 'closed',
-    joints: [11, 12],
-  },
-  shouldersRaised: {
-    label: 'Shoulders raised',
-    meaning: 'Shoulders up toward the ears, compared with their normal. A common sign of tension.',
-    tone: 'closed',
-    joints: [11, 12],
-    tau: 1,
-  },
-  smiling: {
-    label: 'Smiling',
-    meaning: 'Warmth or friendliness.',
-    tone: 'open',
-  },
-  browsLowered: {
-    label: 'Brows lowered',
-    meaning: 'Concentration, confusion, or displeasure.',
-    tone: 'neutral',
-  },
-  browsRaised: {
-    label: 'Brows raised',
-    meaning: 'Interest, surprise, or worry.',
-    tone: 'neutral',
-  },
-  lipsPressed: {
-    label: 'Lips pressed',
-    meaning: 'Holding something back, or quiet tension.',
-    tone: 'closed',
-  },
-  eyeContact: {
-    label: 'Eye contact',
-    meaning: 'Head and eyes toward you. Usually attention.',
-    tone: 'open',
-  },
-  lookingAway: {
-    label: 'Looking away',
-    meaning: 'Gaze elsewhere. Thinking, distracted, or uncomfortable.',
-    tone: 'closed',
-  },
-  lookingDown: {
-    label: 'Looking down',
-    meaning: 'Reflecting, reading, or feeling unsure.',
-    tone: 'neutral',
-  },
-  headTilt: {
-    label: 'Head tilted',
-    meaning: 'Often listening or curious.',
-    tone: 'open',
-  },
-  nodding: {
-    label: 'Nodding',
-    meaning: 'Agreement, or encouragement to keep going.',
-    tone: 'open',
-    tau: 0.5,
-  },
-  headShake: {
-    label: 'Shaking head',
-    meaning: 'Disagreement or disbelief.',
-    tone: 'closed',
-    tau: 0.5,
-  },
-  blinking: {
-    label: 'Blinking a lot',
-    meaning: 'Higher than usual blink rate. Rises with stress, but also with dry or tired eyes.',
-    tone: 'closed',
-    tau: 2,
-  },
+  armsCrossed: { tone: 'closed', joints: [13, 14, 15, 16] },
+  handsOnHips: { tone: 'neutral', joints: [13, 14, 15, 16] },
+  handToFace: { tone: 'neutral', joints: [15, 16, 19, 20] },
+  gesturing: { tone: 'open', joints: [15, 16] },
+  fidgeting: { tone: 'closed', joints: [15, 16, 17, 18, 19, 20], tau: 1 },
+  handsHidden: { tone: 'closed' },
+  leaningIn: { tone: 'open' },
+  leaningBack: { tone: 'closed' },
+  turnedAway: { tone: 'closed', joints: [11, 12] },
+  shouldersRaised: { tone: 'closed', joints: [11, 12], tau: 1 },
+  smiling: { tone: 'open', face: true },
+  browsLowered: { tone: 'neutral', face: true },
+  browsRaised: { tone: 'neutral', face: true },
+  lipsPressed: { tone: 'closed', face: true },
+  eyeContact: { tone: 'open', face: true },
+  lookingAway: { tone: 'closed', face: true },
+  lookingDown: { tone: 'neutral', face: true },
+  headTilt: { tone: 'open', face: true },
+  nodding: { tone: 'open', face: true, tau: 0.5 },
+  headShake: { tone: 'closed', face: true, tau: 0.5 },
+  blinking: { tone: 'closed', face: true, tau: 2 },
 };
 
-const IDS = Object.keys(DEFS) as CueId[];
+export const CUE_IDS = Object.keys(DEFS) as CueId[];
+const IDS = CUE_IDS;
 const SHOW_AT = 0.5;
 const HIDE_AT = 0.3;
 const HEADLINE_HOLD_MS = 1200;
+
+export const isFaceCue = (id: CueId) => !!DEFS[id].face;
+
+export type HeadlineKey =
+  | 'searching'
+  | 'tense'
+  | 'closed'
+  | 'guarded'
+  | 'distracted'
+  | 'thinking'
+  | 'openEngaged'
+  | 'relaxedOpen'
+  | 'attentive'
+  | 'neutral';
+
+export type HintKey = 'noPerson' | 'stepBack' | 'noFace';
 
 export interface Cue extends CueDef {
   id: CueId;
@@ -181,14 +102,29 @@ export interface Cue extends CueDef {
 
 export interface Reading {
   present: boolean;
-  headline: string;
-  detail: string;
-  hint: string | null;
+  bodyVisible: boolean;
+  faceVisible: boolean;
+  headline: HeadlineKey;
+  top: CueId[]; // the two most telling cues, for the one-line explanation
+  hint: HintKey | null;
   openness: number;
   engagement: number;
   tension: number;
   cues: Cue[];
-  highlight: Set<number>;
+}
+
+/** Picks the overall read from the three scores. Also used for the session summary. */
+export function pickHeadline(present: boolean, open: number, engaged: number, tense: number, thinking: boolean): HeadlineKey {
+  if (!present) return 'searching';
+  if (tense > 0.55) return 'tense';
+  if (open < 0.35 && engaged < 0.45) return 'closed';
+  if (open < 0.38) return 'guarded';
+  if (engaged < 0.35) return 'distracted';
+  if (thinking) return 'thinking';
+  if (open > 0.68 && engaged > 0.62) return 'openEngaged';
+  if (open > 0.6) return 'relaxedOpen';
+  if (engaged > 0.65) return 'attentive';
+  return 'neutral';
 }
 
 type Raw = Partial<Record<CueId, number>>;
@@ -216,8 +152,8 @@ export class CueEngine {
   private engagement = new Smooth(1.2, 0.5);
   private tension = new Smooth(1.2, 0);
 
-  private headline = 'Looking for someone';
-  private candidate = this.headline;
+  private headline: HeadlineKey = 'searching';
+  private candidate: HeadlineKey = 'searching';
   private candidateSince = 0;
 
   update(pose: PoseLandmarkerResult | null, face: FaceLandmarkerResult | null, t: number, aspect: number): Reading {
@@ -242,11 +178,7 @@ export class CueEngine {
     // Listed in the order they appeared (a Set keeps insertion order), so rows
     // don't swap places when two cues have similar strength.
     const cues: Cue[] = [];
-    const highlight = new Set<number>();
-    for (const id of this.active) {
-      cues.push({ id, ...DEFS[id], strength: this.smooth.get(id)!.value });
-      if (DEFS[id].tone !== 'open') DEFS[id].joints?.forEach((j) => highlight.add(j));
-    }
+    for (const id of this.active) cues.push({ id, ...DEFS[id], strength: this.smooth.get(id)!.value });
 
     const g = (id: CueId) => this.smooth.get(id)!.value;
     if (present) {
@@ -304,21 +236,22 @@ export class CueEngine {
 
     this.updateHeadline(present, openness, engagement, tension, g('handToFace') > SHOW_AT, t);
 
-    let hint: string | null = null;
-    if (!present) hint = 'Point the camera at one person, about 1.5 to 3 metres away.';
-    else if (!bodyVisible) hint = 'Step back a little so their shoulders and arms are in frame.';
-    else if (!faceVisible) hint = 'Their face isn’t visible, so expression cues are paused.';
+    let hint: HintKey | null = null;
+    if (!present) hint = 'noPerson';
+    else if (!bodyVisible) hint = 'stepBack';
+    else if (!faceVisible) hint = 'noFace';
 
     return {
       present,
+      bodyVisible,
+      faceVisible,
       headline: this.headline,
-      detail: describe(present, cues),
+      top: present ? cues.filter((c) => c.id !== 'eyeContact').slice(0, 2).map((c) => c.id) : [],
       hint,
       openness,
       engagement,
       tension,
       cues,
-      highlight,
     };
   }
 
@@ -479,20 +412,9 @@ export class CueEngine {
   // ---- Summary ----------------------------------------------------------
 
   private updateHeadline(present: boolean, open: number, engaged: number, tense: number, thinking: boolean, t: number) {
-    let next: string;
-    if (!present) next = 'Looking for someone';
-    else if (tense > 0.55) next = 'Seems tense';
-    else if (open < 0.35 && engaged < 0.45) next = 'Closed off';
-    else if (open < 0.38) next = 'Guarded';
-    else if (engaged < 0.35) next = 'Distracted';
-    else if (thinking) next = 'Thinking it over';
-    else if (open > 0.68 && engaged > 0.62) next = 'Open and engaged';
-    else if (open > 0.6) next = 'Relaxed and open';
-    else if (engaged > 0.65) next = 'Paying attention';
-    else next = 'Neutral';
-
+    const next = pickHeadline(present, open, engaged, tense, thinking);
     // Switch instantly when someone appears or leaves; otherwise wait for it to hold.
-    const appearing = this.headline === 'Looking for someone' || next === 'Looking for someone';
+    const appearing = this.headline === 'searching' || next === 'searching';
     if (next !== this.candidate) {
       this.candidate = next;
       this.candidateSince = t;
@@ -509,12 +431,4 @@ export class CueEngine {
     this.blinks = [];
     this.faceSeconds = 0;
   }
-}
-
-function describe(present: boolean, cues: Cue[]) {
-  if (!present) return 'Nothing is recorded. Each frame is read and thrown away.';
-  const telling = cues.filter((c) => c.id !== 'eyeContact').slice(0, 2);
-  if (!telling.length) return 'No strong signals right now.';
-  const names = telling.map((c) => c.label.toLowerCase());
-  return `Mostly from ${names.join(' and ')}.`;
 }

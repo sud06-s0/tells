@@ -6,6 +6,7 @@
 // introduce the two devices; it never sees the video. Nothing is recorded.
 import Peer, { type DataConnection, type MediaConnection, type PeerOptions } from 'peerjs';
 import type { Facing } from './camera';
+import type { Key, Lang } from './i18n';
 
 type Message = { type: 'facing'; facing: Facing } | { type: 'flip' } | { type: 'bye' };
 
@@ -33,12 +34,25 @@ function randomCode(length = 12) {
   return Array.from(bytes, (b) => alphabet[b % alphabet.length]).join('');
 }
 
-export function pairUrl(code: string) {
+/** Link the phone opens. It carries the language, and which camera to start with. */
+export function pairUrl(code: string, opts: { lang: Lang; self: boolean; facing: Facing }) {
   const url = new URL(location.href);
   url.search = '';
   url.hash = '';
   url.searchParams.set('pair', code);
+  url.searchParams.set('lang', opts.lang);
+  url.searchParams.set('cam', opts.facing);
+  if (opts.self) url.searchParams.set('self', '1');
   return url.href;
+}
+
+/** Options the desktop put in the link (see pairUrl). */
+export function pairOptionsFromUrl() {
+  const params = new URLSearchParams(location.search);
+  return {
+    self: params.get('self') === '1',
+    facing: (params.get('cam') === 'user' ? 'user' : 'environment') as Facing,
+  };
 }
 
 export function pairCodeFromUrl() {
@@ -57,20 +71,20 @@ export function isPhoneOrTablet() {
   return /Android|iPhone|iPad|iPod|Mobile/i.test(ua) || iPadOS;
 }
 
-function describePeerError(type: string) {
+function describePeerError(type: string): Key {
   switch (type) {
     case 'peer-unavailable':
-      return 'The computer isn’t waiting any more. Scan a fresh code on the computer.';
+      return 'link.peerUnavailable';
     case 'network':
     case 'server-error':
     case 'socket-error':
     case 'socket-closed':
     case 'disconnected':
-      return 'The connection service couldn’t be reached. Check your internet and try again.';
+      return 'link.network';
     case 'browser-incompatible':
-      return 'This browser can’t make a direct video connection. Try Chrome or Safari.';
+      return 'link.browser';
     default:
-      return 'The connection failed. Try again.';
+      return 'link.failed';
   }
 }
 
@@ -80,7 +94,7 @@ export interface DesktopEvents {
   onReady: (code: string) => void;
   onStream: (stream: MediaStream) => void;
   onFacing: (facing: Facing) => void;
-  onClose: (reason: string) => void;
+  onClose: (reason: Key) => void;
 }
 
 export class DesktopLink {
@@ -102,7 +116,7 @@ export class DesktopLink {
       if (this.conn) return conn.close();
       this.conn = conn;
       conn.on('data', (data) => this.handle(data as Message));
-      conn.on('close', () => this.end('Your phone disconnected.'));
+      conn.on('close', () => this.end('link.phoneDisconnected'));
     });
 
     this.peer.on('call', (call) => {
@@ -110,10 +124,10 @@ export class DesktopLink {
       this.call = call;
       call.answer(); // receive only: the desktop sends no video back
       call.on('stream', (stream) => this.events.onStream(stream));
-      call.on('close', () => this.end('Your phone stopped sharing its camera.'));
+      call.on('close', () => this.end('link.phoneStopped'));
       call.peerConnection?.addEventListener('connectionstatechange', () => {
         const state = call.peerConnection.connectionState;
-        if (state === 'failed') this.end('The video link to your phone dropped. Both devices on the same Wi-Fi works best.');
+        if (state === 'failed') this.end('link.phoneDropped');
       });
     });
 
@@ -143,10 +157,10 @@ export class DesktopLink {
 
   private handle(msg: Message) {
     if (msg?.type === 'facing') this.events.onFacing(msg.facing === 'user' ? 'user' : 'environment');
-    if (msg?.type === 'bye') this.end('Your phone stopped sharing its camera.');
+    if (msg?.type === 'bye') this.end('link.phoneStopped');
   }
 
-  private end(reason: string) {
+  private end(reason: Key) {
     if (this.closed) return;
     this.closed = true;
     this.peer.destroy();
@@ -159,7 +173,7 @@ export class DesktopLink {
 export interface PhoneEvents {
   onConnected: () => void;
   onFlipRequest: () => void;
-  onClose: (reason: string) => void;
+  onClose: (reason: Key) => void;
 }
 
 export class PhoneLink {
@@ -180,16 +194,16 @@ export class PhoneLink {
       this.conn.on('data', (data) => {
         const msg = data as Message;
         if (msg?.type === 'flip') this.events.onFlipRequest();
-        if (msg?.type === 'bye') this.end('The computer ended the session.');
+        if (msg?.type === 'bye') this.end('link.computerEnded');
       });
-      this.conn.on('close', () => this.end('The computer disconnected.'));
+      this.conn.on('close', () => this.end('link.computerDisconnected'));
 
       this.call = this.peer.call(target, stream);
-      this.call.on('close', () => this.end('The computer disconnected.'));
+      this.call.on('close', () => this.end('link.computerDisconnected'));
       this.call.peerConnection?.addEventListener('connectionstatechange', () => {
         const state = this.call?.peerConnection.connectionState;
         if (state === 'connected') this.events.onConnected();
-        if (state === 'failed') this.end('The video link dropped. Both devices on the same Wi-Fi works best.');
+        if (state === 'failed') this.end('link.computerDropped');
       });
     });
 
@@ -215,7 +229,7 @@ export class PhoneLink {
     if (this.conn?.open) this.conn.send({ type: 'facing', facing } satisfies Message);
   }
 
-  private end(reason: string) {
+  private end(reason: Key) {
     if (this.closed) return;
     this.closed = true;
     this.peer.destroy();

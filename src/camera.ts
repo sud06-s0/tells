@@ -1,5 +1,6 @@
 // src/camera.ts
 // Live camera feed. Frames stay in the <video> element's memory; nothing is recorded.
+import type { Key } from './i18n';
 
 export type Facing = 'user' | 'environment';
 
@@ -56,17 +57,18 @@ export class Camera {
   }
 }
 
-export function cameraErrorMessage(err: unknown) {
+/** Which translated message explains a camera failure. */
+export function cameraErrorKey(err: unknown): Key {
   const name = err instanceof DOMException ? err.name : '';
   switch (name) {
     case 'NotAllowedError':
-      return 'Camera access is blocked. Allow the camera for this site in your browser settings, then try again.';
+      return 'err.camBlocked';
     case 'NotFoundError':
     case 'OverconstrainedError':
-      return 'No camera was found on this device.';
+      return 'err.camMissing';
     case 'NotReadableError':
-      return 'Another app is using the camera. Close it and try again.';
+      return 'err.camBusy';
     default:
-      return 'The camera could not start. Reload the page and try again.';
+      return 'err.camFailed';
   }
 }

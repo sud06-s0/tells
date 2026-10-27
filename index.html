@@ -5,7 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#0f2a2e" />
-    <meta name="description" content="A live, on-device read of body language from your camera. Nothing is recorded." />
+    <meta name="description" content="Live, on-device body language reading and practice. Nothing is recorded." />
     <title>Tells</title>
     <link
       rel="icon"
@@ -14,44 +14,78 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Recursive:slnt,wght,CASL@-15..0,300..800,0..1&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Recursive:slnt,wght,CASL@-15..0,300..800,0..1&family=Noto+Sans+Bengali:wght@400..700&family=Noto+Sans+Devanagari:wght@400..700&display=swap"
       rel="stylesheet"
     />
   </head>
   <body class="font-sans antialiased">
-    <!-- Start -->
-    <section id="intro" class="grid min-h-dvh place-items-center px-6 py-12">
-      <div class="w-full max-w-md">
-        <h1 class="headline text-6xl" style="font-variation-settings: 'CASL' 1, 'wght' 720, 'slnt' -8">Tells</h1>
-        <p class="mt-4 text-lg leading-relaxed text-chalk/90">
-          Point your camera at someone and get a live read of their posture, gestures and expression.
-        </p>
+    <!-- Start: choose a mode -->
+    <section id="intro" class="min-h-dvh px-6 py-10">
+      <div class="mx-auto w-full max-w-lg">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <h1 class="headline text-5xl" style="font-variation-settings: 'CASL' 1, 'wght' 720, 'slnt' -8">Tells</h1>
+          <div data-lang-switch class="flex rounded-full bg-dusk-800 p-1"></div>
+        </div>
+        <p class="mt-4 text-lg leading-relaxed text-chalk/90" data-i18n="intro.tagline"></p>
 
-        <ul class="mt-8 space-y-3 border-l-2 border-seaglass/60 pl-4 text-fog">
-          <li>Everything runs on this device.</li>
-          <li>No video or photos are saved or sent anywhere.</li>
-          <li>Leaving the page turns the camera off.</li>
+        <fieldset class="mt-8">
+          <legend class="font-semibold text-chalk" data-i18n="intro.modeLegend"></legend>
+          <div class="mt-3 divide-y divide-chalk/10 border-y border-chalk/10">
+            <label class="flex cursor-pointer gap-4 px-3 py-4 transition has-checked:bg-chalk/[0.06]" data-mode-row="read">
+              <input type="radio" name="mode" value="read" class="mt-1.5 size-4 shrink-0 accent-seaglass" />
+              <span>
+                <span class="block font-semibold text-chalk" data-i18n="mode.read.name"></span>
+                <span class="mt-1 block text-sm leading-relaxed text-fog" data-i18n="mode.read.desc"></span>
+              </span>
+            </label>
+            <label class="flex cursor-pointer gap-4 px-3 py-4 transition has-checked:bg-chalk/[0.06]" data-mode-row="interview">
+              <input type="radio" name="mode" value="interview" class="mt-1.5 size-4 shrink-0 accent-seaglass" />
+              <span>
+                <span class="block font-semibold text-chalk" data-i18n="mode.interview.name"></span>
+                <span class="mt-1 block text-sm leading-relaxed text-fog" data-i18n="mode.interview.desc"></span>
+              </span>
+            </label>
+            <label class="flex cursor-pointer gap-4 px-3 py-4 transition has-checked:bg-chalk/[0.06]" data-mode-row="presentation">
+              <input type="radio" name="mode" value="presentation" class="mt-1.5 size-4 shrink-0 accent-seaglass" />
+              <span>
+                <span class="block font-semibold text-chalk" data-i18n="mode.presentation.name"></span>
+                <span class="mt-1 block text-sm leading-relaxed text-fog" data-i18n="mode.presentation.desc"></span>
+              </span>
+            </label>
+            <label class="flex cursor-pointer gap-4 px-3 py-4 transition has-checked:bg-chalk/[0.06]" data-mode-row="call">
+              <input type="radio" name="mode" value="call" class="mt-1.5 size-4 shrink-0 accent-seaglass" />
+              <span>
+                <span class="block font-semibold text-chalk" data-i18n="mode.call.name"></span>
+                <span class="mt-1 block text-sm leading-relaxed text-fog" data-i18n="mode.call.desc"></span>
+              </span>
+            </label>
+          </div>
+        </fieldset>
+
+        <ul class="mt-8 space-y-2 border-l-2 border-seaglass/60 pl-4 text-sm text-fog">
+          <li data-i18n="privacy.device"></li>
+          <li data-i18n="privacy.nothingSaved"></li>
+          <li data-i18n="privacy.leave"></li>
         </ul>
 
-        <p class="mt-8 text-sm leading-relaxed text-fog">
-          Body language shows cues, not thoughts. Crossed arms can just mean someone is cold. Ask before you point a
-          camera at anyone.
-        </p>
+        <p id="note-read" class="mt-6 text-sm leading-relaxed text-fog" data-i18n="note.read"></p>
+        <label id="consent-row" class="mt-4 flex cursor-pointer gap-3 rounded-2xl bg-dusk-800 px-4 py-3 text-sm text-chalk">
+          <input id="consent" type="checkbox" class="mt-0.5 size-4 shrink-0 accent-seaglass" />
+          <span data-i18n="consent.read"></span>
+        </label>
+        <p id="note-self" class="mt-6 text-sm leading-relaxed text-fog" data-i18n="note.self" hidden></p>
 
         <button
           id="start"
-          class="mt-8 w-full rounded-2xl bg-chalk px-6 py-4 text-lg font-semibold text-dusk-900 transition hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-seaglass disabled:opacity-60"
-        >
-          Start camera
-        </button>
-        <!-- Desktop only: shown by main.ts when this isn't a phone -->
+          class="mt-6 w-full rounded-2xl bg-chalk px-6 py-4 text-lg font-semibold text-dusk-900 transition hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-seaglass disabled:cursor-not-allowed disabled:opacity-50"
+        ></button>
+        <!-- Desktop only -->
         <button
           id="use-phone"
-          class="mt-3 w-full rounded-2xl border-2 border-chalk/25 px-6 py-4 text-lg font-semibold text-chalk transition hover:border-chalk/60 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-seaglass"
+          class="mt-3 w-full rounded-2xl border-2 border-chalk/25 px-6 py-4 text-lg font-semibold text-chalk transition hover:border-chalk/60 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-seaglass disabled:cursor-not-allowed disabled:opacity-50"
+          data-i18n="start.phone"
           hidden
-        >
-          Use your phone’s camera
-        </button>
+        ></button>
         <p id="intro-error" class="mt-4 text-amber" role="alert" hidden></p>
       </div>
     </section>
@@ -60,37 +94,32 @@
     <section id="pair" class="grid min-h-dvh place-items-center px-6 py-12" hidden>
       <div class="grid w-full max-w-3xl items-center gap-12 md:grid-cols-[1fr_auto]">
         <div>
-          <h2 class="headline text-5xl" style="font-variation-settings: 'CASL' 1, 'wght' 700, 'slnt' -8">Scan with your phone</h2>
+          <h2 class="headline text-5xl" style="font-variation-settings: 'CASL' 1, 'wght' 700, 'slnt' -8" data-i18n="pair.heading"></h2>
           <ol class="mt-8 space-y-4 text-chalk/90">
-            <li class="flex gap-4"><span class="w-5 shrink-0 font-semibold text-seaglass">1</span>Open your phone’s camera and point it at the code.</li>
-            <li class="flex gap-4"><span class="w-5 shrink-0 font-semibold text-seaglass">2</span>Open the link and tap Share camera.</li>
-            <li class="flex gap-4"><span class="w-5 shrink-0 font-semibold text-seaglass">3</span>Point the phone at the person. The reading appears here.</li>
+            <li class="flex gap-4"><span class="w-5 shrink-0 font-semibold text-seaglass">1</span><span data-i18n="pair.step1"></span></li>
+            <li class="flex gap-4"><span class="w-5 shrink-0 font-semibold text-seaglass">2</span><span data-i18n="pair.step2"></span></li>
+            <li class="flex gap-4"><span class="w-5 shrink-0 font-semibold text-seaglass">3</span><span id="pair-step3"></span></li>
           </ol>
-          <p class="mt-8 text-sm leading-relaxed text-fog">
-            The phone’s video goes straight to this computer over an encrypted link and is never recorded. Both devices on
-            the same Wi-Fi gives the most reliable connection.
-          </p>
-          <p id="pair-status" class="mt-6 font-semibold text-chalk" role="status">Creating a code…</p>
+          <p class="mt-8 text-sm leading-relaxed text-fog" data-i18n="pair.note"></p>
+          <p id="pair-status" class="mt-6 font-semibold text-chalk" role="status"></p>
           <p id="pair-error" class="mt-2 text-amber" role="alert" hidden></p>
           <div class="mt-8 flex flex-wrap gap-3">
             <button
               id="pair-cancel"
               class="rounded-2xl border-2 border-chalk/25 px-5 py-3 font-semibold text-chalk transition hover:border-chalk/60 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-seaglass"
-            >
-              Back
-            </button>
+              data-i18n="pair.back"
+            ></button>
             <button
               id="pair-copy"
               class="rounded-2xl border-2 border-chalk/25 px-5 py-3 font-semibold text-chalk transition hover:border-chalk/60 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-seaglass disabled:opacity-50"
               disabled
-            >
-              Copy link
-            </button>
+              data-i18n="pair.copy"
+            ></button>
           </div>
         </div>
         <div class="justify-self-center">
           <div class="grid size-64 place-items-center rounded-[28px] bg-chalk p-5">
-            <canvas id="pair-qr" class="size-full" aria-label="QR code for pairing your phone" role="img"></canvas>
+            <canvas id="pair-qr" class="size-full" role="img" data-i18n-aria="pair.qrLabel"></canvas>
           </div>
           <p id="pair-code" class="mt-3 text-center text-sm text-fog"></p>
         </div>
@@ -101,33 +130,37 @@
     <section id="sender" class="relative h-dvh overflow-hidden bg-dusk-950" hidden>
       <video id="sender-video" class="absolute inset-0 h-full w-full object-cover" playsinline muted></video>
 
-      <div class="absolute inset-x-0 top-0 bg-gradient-to-b from-dusk-950/85 to-transparent px-5 pb-10 pt-[max(1.25rem,env(safe-area-inset-top))]">
-        <p class="headline text-2xl" style="font-variation-settings: 'CASL' 1, 'wght' 700, 'slnt' -8">Tells</p>
-        <p class="text-xs text-fog">Video goes straight to your computer. Nothing is saved.</p>
+      <div
+        class="absolute inset-x-0 top-0 flex items-start justify-between gap-3 bg-gradient-to-b from-dusk-950/85 to-transparent px-5 pb-10 pt-[max(1.25rem,env(safe-area-inset-top))]"
+      >
+        <div>
+          <p class="headline text-2xl" style="font-variation-settings: 'CASL' 1, 'wght' 700, 'slnt' -8">Tells</p>
+          <p class="text-xs text-fog" data-i18n="sender.tagline"></p>
+        </div>
+        <div data-lang-switch class="flex shrink-0 rounded-full bg-dusk-900/80 p-1"></div>
       </div>
 
-      <div class="absolute inset-x-0 bottom-0 rounded-t-[28px] bg-dusk-900/90 px-5 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] backdrop-blur-md">
-        <p id="sender-title" class="headline text-3xl" aria-live="polite">Your computer is ready</p>
-        <p id="sender-note" class="mt-2 text-fog">Share this phone’s camera with it. The reading shows on the computer.</p>
+      <div
+        class="absolute inset-x-0 bottom-0 rounded-t-[28px] bg-dusk-900/90 px-5 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] backdrop-blur-md"
+      >
+        <p id="sender-title" class="headline text-3xl" aria-live="polite"></p>
+        <p id="sender-note" class="mt-2 text-fog"></p>
         <button
           id="sender-start"
           class="mt-6 w-full rounded-2xl bg-chalk px-6 py-4 text-lg font-semibold text-dusk-900 transition focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-seaglass disabled:opacity-60"
-        >
-          Share camera
-        </button>
+          data-i18n="sender.share"
+        ></button>
         <div id="sender-controls" class="mt-6 grid grid-cols-2 gap-3" hidden>
           <button
             id="sender-flip"
             class="rounded-2xl border-2 border-chalk/25 px-4 py-3 font-semibold text-chalk focus-visible:outline-2 focus-visible:outline-seaglass disabled:opacity-50"
-          >
-            Switch camera
-          </button>
+            data-i18n="sender.switch"
+          ></button>
           <button
             id="sender-stop"
             class="rounded-2xl bg-chalk px-4 py-3 font-semibold text-dusk-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-seaglass"
-          >
-            Stop sharing
-          </button>
+            data-i18n="sender.stop"
+          ></button>
         </div>
       </div>
     </section>
@@ -139,17 +172,18 @@
         <canvas id="overlay" class="pointer-events-none absolute inset-0 h-full w-full"></canvas>
 
         <div
-          class="absolute inset-x-0 top-0 flex items-center justify-between gap-3 bg-gradient-to-b from-dusk-950/80 to-transparent px-4 pb-8 pt-[max(1rem,env(safe-area-inset-top))]"
+          class="absolute inset-x-0 top-0 z-10 flex items-center justify-between gap-3 bg-gradient-to-b from-dusk-950/80 to-transparent px-4 pb-8 pt-[max(1rem,env(safe-area-inset-top))]"
         >
-          <div>
+          <div class="min-w-0">
             <p class="headline text-2xl" style="font-variation-settings: 'CASL' 1, 'wght' 700, 'slnt' -8">Tells</p>
-            <p id="live-source" class="text-xs text-fog">On device. Nothing is saved.</p>
+            <p id="live-source" class="truncate text-xs text-fog"></p>
           </div>
-          <div class="flex gap-2">
+          <div class="flex shrink-0 items-center gap-2">
+            <span id="timer" class="rounded-full bg-dusk-900/70 px-3 py-2 text-sm font-semibold tabular-nums text-chalk backdrop-blur" hidden></span>
             <button
               id="flip"
               class="grid size-11 place-items-center rounded-full bg-dusk-900/70 text-chalk backdrop-blur hover:bg-dusk-800 focus-visible:outline-2 focus-visible:outline-seaglass"
-              aria-label="Switch camera"
+              data-i18n-aria="live.switchCamera"
               hidden
             >
               <svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -160,7 +194,6 @@
             <button
               id="toggle-overlay"
               class="grid size-11 place-items-center rounded-full bg-dusk-900/70 text-chalk backdrop-blur hover:bg-dusk-800 focus-visible:outline-2 focus-visible:outline-seaglass aria-pressed:bg-chalk aria-pressed:text-dusk-900"
-              aria-label="Show skeleton"
               aria-pressed="true"
             >
               <svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -171,11 +204,21 @@
             <button
               id="stop"
               class="grid size-11 place-items-center rounded-full bg-dusk-900/70 text-chalk backdrop-blur hover:bg-dusk-800 focus-visible:outline-2 focus-visible:outline-seaglass"
-              aria-label="Turn camera off"
             >
               <svg viewBox="0 0 24 24" class="size-4" fill="currentColor" aria-hidden="true"><rect x="5" y="5" width="14" height="14" rx="2.5" /></svg>
             </button>
           </div>
+        </div>
+
+        <!-- Practice modes: a few seconds to learn your normal posture -->
+        <div
+          id="calibrate"
+          class="pointer-events-none absolute inset-x-4 top-24 mx-auto max-w-sm rounded-[24px] bg-dusk-900/85 p-5 text-center backdrop-blur"
+          hidden
+        >
+          <p id="calib-count" class="headline text-6xl tabular-nums" style="font-variation-settings: 'CASL' 1, 'wght' 700, 'slnt' -8"></p>
+          <p id="calib-title" class="mt-2 text-lg font-semibold text-chalk"></p>
+          <p class="mt-1 text-sm text-fog" data-i18n="calib.body"></p>
         </div>
 
         <div id="status" class="absolute inset-0 grid place-items-center bg-dusk-950/70 px-8 text-center text-chalk" hidden>
@@ -186,22 +229,31 @@
       <aside
         id="panel"
         class="absolute inset-x-0 bottom-0 max-h-[46dvh] overflow-y-auto rounded-t-[28px] bg-dusk-900/90 px-5 pt-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] backdrop-blur-md lg:static lg:max-h-none lg:rounded-[28px] lg:bg-dusk-800 lg:p-7"
-        aria-label="Body language reading"
       >
-        <p id="headline" class="headline text-4xl leading-[1.05] lg:text-5xl" aria-live="polite">Looking for someone</p>
-        <p id="detail" class="mt-2 text-fog">Nothing is recorded. Each frame is read and thrown away.</p>
+        <p id="headline" class="headline text-4xl leading-[1.05] lg:text-5xl" aria-live="polite"></p>
+        <p id="detail" class="mt-2 text-fog"></p>
+
+        <!-- Video call check only -->
+        <div id="call-tools" class="mt-5" hidden>
+          <button
+            id="popout"
+            class="rounded-2xl bg-chalk px-5 py-3 font-semibold text-dusk-900 transition hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-seaglass"
+            data-i18n="call.popOut"
+          ></button>
+          <p id="popout-help" class="mt-2 text-sm leading-relaxed text-fog"></p>
+        </div>
 
         <dl class="mt-5 grid grid-cols-[auto_1fr] items-center gap-x-4 gap-y-2 text-sm">
-          <dt class="text-fog">Openness</dt>
-          <dd id="meter-openness" class="h-2 overflow-hidden rounded-full bg-chalk/10" role="meter" aria-label="Openness" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <dt class="text-fog" data-i18n="meter.openness"></dt>
+          <dd id="meter-openness" class="h-2 overflow-hidden rounded-full bg-chalk/10" role="meter" data-i18n-aria="meter.openness" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
             <span class="block h-full w-0 rounded-full bg-seaglass transition-[width] duration-500"></span>
           </dd>
-          <dt class="text-fog">Engagement</dt>
-          <dd id="meter-engagement" class="h-2 overflow-hidden rounded-full bg-chalk/10" role="meter" aria-label="Engagement" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <dt class="text-fog" data-i18n="meter.engagement"></dt>
+          <dd id="meter-engagement" class="h-2 overflow-hidden rounded-full bg-chalk/10" role="meter" data-i18n-aria="meter.engagement" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
             <span class="block h-full w-0 rounded-full bg-chalk/80 transition-[width] duration-500"></span>
           </dd>
-          <dt class="text-fog">Tension</dt>
-          <dd id="meter-tension" class="h-2 overflow-hidden rounded-full bg-chalk/10" role="meter" aria-label="Tension" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <dt class="text-fog" data-i18n="meter.tension"></dt>
+          <dd id="meter-tension" class="h-2 overflow-hidden rounded-full bg-chalk/10" role="meter" data-i18n-aria="meter.tension" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
             <span class="block h-full w-0 rounded-full bg-amber transition-[width] duration-500"></span>
           </dd>
         </dl>
@@ -209,9 +261,77 @@
         <p id="hint" class="mt-5 rounded-2xl bg-dusk-700/60 px-4 py-3 text-sm text-chalk" hidden></p>
 
         <ul id="cues" class="mt-3 divide-y divide-chalk/10"></ul>
-        <p id="cues-empty" class="mt-4 text-sm text-fog" hidden>No strong cues right now. That usually reads as neutral.</p>
+        <p id="cues-empty" class="mt-4 text-sm text-fog" hidden></p>
       </aside>
     </main>
+
+    <!-- Practice summary -->
+    <section id="summary" class="min-h-dvh px-6 py-10" hidden>
+      <div class="mx-auto w-full max-w-3xl">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <p class="headline text-3xl" style="font-variation-settings: 'CASL' 1, 'wght' 700, 'slnt' -8">Tells</p>
+          <div data-lang-switch class="flex rounded-full bg-dusk-800 p-1"></div>
+        </div>
+
+        <p id="sum-sub" class="mt-12 text-fog"></p>
+        <h2 id="sum-headline" class="headline mt-2 text-5xl md:text-6xl"></h2>
+        <p id="sum-short" class="mt-5 max-w-xl rounded-2xl bg-dusk-700/60 px-4 py-3 text-sm text-chalk" data-i18n="sum.short" hidden></p>
+
+        <dl class="mt-8 grid max-w-md grid-cols-[auto_1fr_auto] items-center gap-x-4 gap-y-3 text-sm">
+          <dt class="text-fog" data-i18n="meter.openness"></dt>
+          <dd class="h-2 overflow-hidden rounded-full bg-chalk/10"><span id="sum-m-openness" class="block h-full rounded-full bg-seaglass"></span></dd>
+          <dd id="sum-v-openness" class="text-right tabular-nums text-chalk"></dd>
+          <dt class="text-fog" data-i18n="meter.engagement"></dt>
+          <dd class="h-2 overflow-hidden rounded-full bg-chalk/10"><span id="sum-m-engagement" class="block h-full rounded-full bg-chalk/80"></span></dd>
+          <dd id="sum-v-engagement" class="text-right tabular-nums text-chalk"></dd>
+          <dt class="text-fog" data-i18n="meter.tension"></dt>
+          <dd class="h-2 overflow-hidden rounded-full bg-chalk/10"><span id="sum-m-tension" class="block h-full rounded-full bg-amber"></span></dd>
+          <dd id="sum-v-tension" class="text-right tabular-nums text-chalk"></dd>
+        </dl>
+
+        <div class="mt-12 grid gap-10 md:grid-cols-2">
+          <section>
+            <h3 class="flex items-center gap-2 text-lg font-semibold text-chalk">
+              <span class="size-2.5 rounded-full bg-seaglass" aria-hidden="true"></span><span data-i18n="sum.wentWell"></span>
+            </h3>
+            <ul id="sum-well" class="mt-3 divide-y divide-chalk/10"></ul>
+          </section>
+          <section>
+            <h3 class="flex items-center gap-2 text-lg font-semibold text-chalk">
+              <span class="size-2.5 rounded-full bg-amber" aria-hidden="true"></span><span data-i18n="sum.workOn"></span>
+            </h3>
+            <ul id="sum-work" class="mt-3 divide-y divide-chalk/10"></ul>
+          </section>
+        </div>
+
+        <p class="mt-12 text-sm text-fog" data-i18n="sum.notSaved"></p>
+        <div class="mt-6 flex flex-wrap gap-3">
+          <button
+            id="sum-again"
+            class="rounded-2xl bg-chalk px-6 py-4 text-lg font-semibold text-dusk-900 transition hover:bg-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-seaglass"
+            data-i18n="sum.again"
+          ></button>
+          <button
+            id="sum-modes"
+            class="rounded-2xl border-2 border-chalk/25 px-6 py-4 text-lg font-semibold text-chalk transition hover:border-chalk/60 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-seaglass"
+            data-i18n="sum.modes"
+          ></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Video call check pop-out window contents (moved into the pop-out when opened) -->
+    <div id="pip-card" class="flex h-dvh flex-col gap-3 bg-dusk-900 p-3 text-chalk" hidden>
+      <div id="pip-video-slot" class="relative min-h-0 flex-1 overflow-hidden rounded-2xl bg-dusk-950"></div>
+      <p id="pip-nudge" class="headline text-2xl leading-tight" aria-live="polite"></p>
+      <div class="flex items-center justify-between gap-2">
+        <span id="pip-timer" class="text-sm tabular-nums text-fog"></span>
+        <div class="flex gap-2">
+          <button id="pip-back" class="rounded-xl border-2 border-chalk/25 px-3 py-1.5 text-sm font-semibold text-chalk" data-i18n="call.popIn"></button>
+          <button id="pip-end" class="rounded-xl bg-chalk px-3 py-1.5 text-sm font-semibold text-dusk-900" data-i18n="live.end"></button>
+        </div>
+      </div>
+    </div>
 
     <script type="module" src="/src/main.ts"></script>
   </body>
